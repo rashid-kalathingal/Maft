@@ -1,0 +1,162 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Caveat:wght@600;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* RGB channels so Tailwind can apply opacity modifiers (e.g. bg-accent/10) */
+  --color-primary: 28 23 18;      /* warm espresso */
+  --color-accent: 142 89 39;      /* rich bronze #8e5927 */
+  --color-accent-dark: 120 73 29; /* #78491d */
+  --color-surface: 245 240 232;   /* warm cream */
+  --color-muted: 124 116 105;
+  --color-ink: 41 34 28;
+  --color-ink-soft: 74 65 56;
+  --color-line: 232 225 214;
+  --color-success: 22 132 91;
+  --color-danger: 198 73 54;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: #fdfbf7;
+  color: rgb(var(--color-ink));
+  font-family: "Inter", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Display (serif) for headings and the brand wordmark */
+h1, h2, h3, h4, .font-display {
+  font-family: "Inter", system-ui, sans-serif;
+  letter-spacing: -0.01em;
+}
+
+.home-page .home-hero { background: linear-gradient(90deg, #f7f4ef 0%, #fff 48%, #f0e7dc 100%); }
+.home-page .home-hero > div:first-of-type { background-image: none !important; }
+
+/* Consistent admin workspace surfaces and controls */
+.admin-shell { --admin-border: #e2e7ed; --admin-muted: #667085; }
+.admin-shell .card {
+  border-color: var(--admin-border);
+  border-radius: 0.75rem;
+  background: #fff;
+  box-shadow: 0 1px 2px rgb(16 24 40 / 4%);
+}
+.admin-shell .input {
+  border-color: #d5dce5;
+  border-radius: 0.5rem;
+  background-color: #fff;
+}
+.admin-shell table thead { background-color: #f7f8fa; }
+.admin-shell table tbody tr { transition: background-color 120ms ease; }
+.admin-shell .btn-primary { background-color: #26384c; }
+.admin-shell .btn-primary:hover { background-color: #1a2939; }
+.admin-shell aside nav a[aria-current="page"] {
+  background-color: rgb(255 255 255 / 12%);
+  box-shadow: inset 3px 0 #c09255;
+}
+.admin-shell h1, .admin-shell h2, .admin-shell h3 { letter-spacing: -0.025em; }
+.font-script {
+  font-family: "Caveat", cursive;
+}
+
+/* Thin, tasteful scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 999px;
+  border: 2px solid #fff;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #b9bfc8;
+}
+
+@layer components {
+  .container-app {
+    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100;
+  }
+  .btn-primary {
+    @apply btn bg-primary text-white shadow-sm hover:bg-[#0c141e] hover:shadow-md;
+  }
+  .btn-accent {
+    @apply btn bg-accent text-white shadow-sm hover:bg-accent-dark hover:shadow-md;
+  }
+  .btn-outline {
+    @apply btn border border-line bg-white text-ink hover:bg-surface;
+  }
+  .btn-ghost {
+    @apply btn text-ink-soft hover:bg-surface;
+  }
+  .btn-danger {
+    @apply btn bg-danger text-white hover:bg-[#b52a39];
+  }
+  .btn-wa {
+    @apply btn bg-[#25D366] text-white hover:bg-[#1da851];
+  }
+  .input {
+    @apply w-full rounded-lg border border-line bg-white px-3 py-2.5 text-sm text-ink placeholder:text-muted focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30;
+  }
+  .label {
+    @apply mb-1.5 block text-sm font-medium text-ink-soft;
+  }
+  .card {
+    @apply rounded-2xl border border-line bg-white shadow-soft;
+  }
+  .badge {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold;
+  }
+  .eyebrow {
+    @apply text-xs font-bold uppercase tracking-[0.22em] text-accent;
+  }
+}
+
+/* ---- Animations ---- */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes float-y {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-10px); }
+}
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* Scroll reveal: hidden until .is-visible is toggled by IntersectionObserver */
+.reveal {
+  opacity: 0;
+  transform: translateY(26px);
+  transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+.animate-fade-up { animation: fade-up 0.8s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.animate-fade-in { animation: fade-in 1s ease both; }
+.animate-float { animation: float-y 6s ease-in-out infinite; }
+.animate-marquee { animation: marquee 28s linear infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
+  .animate-fade-up, .animate-fade-in, .animate-float, .animate-marquee { animation: none; }
+}
