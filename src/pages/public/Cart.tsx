@@ -6,7 +6,7 @@ import { useData } from "@/stores/useData";
 import { toast } from "@/stores/useToast";
 import { Modal } from "@/components/ui/Modal";
 import { ProductImage } from "@/components/ui/ProductImage";
-import { productImageSrc } from "@/data/images";
+import { primaryImage } from "@/data/images";
 import {
   buildWhatsAppMessage,
   buildWhatsAppUrl,
@@ -64,7 +64,7 @@ export function Cart() {
             return (
               <div key={cartItem.id} className="card flex gap-4 p-3.5">
                 <Link to={`/products/${line.product.slug}`} className="h-24 w-24 shrink-0 overflow-hidden rounded-lg border border-line">
-                  <ProductImage label={line.product.imageLabel} seed={line.product.id} src={productImageSrc(line.product.id, line.product.categoryId, 220)} icon={cat?.icon} size="sm" />
+                  <ProductImage label={line.product.imageLabel} seed={line.product.id} src={primaryImage(line.product, 220)} icon={cat?.icon} size="sm" />
                 </Link>
                 <div className="flex min-w-0 flex-1 flex-col">
                   <div className="flex items-start justify-between gap-2">

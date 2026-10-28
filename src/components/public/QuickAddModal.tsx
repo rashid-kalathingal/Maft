@@ -4,7 +4,7 @@ import { ShoppingCart } from "lucide-react";
 import type { Product } from "@/types";
 import { Modal } from "@/components/ui/Modal";
 import { ProductImage } from "@/components/ui/ProductImage";
-import { productImageSrc } from "@/data/images";
+import { primaryImage } from "@/data/images";
 import { VariantControls } from "./VariantControls";
 import { useVariantSelection } from "@/lib/useVariantSelection";
 import { useData } from "@/stores/useData";
@@ -48,7 +48,7 @@ export function QuickAddModal({ product, onClose }: { product: Product; onClose:
     >
       <div className="flex gap-4">
         <div className="h-24 w-24 shrink-0 overflow-hidden rounded-lg border border-line">
-          <ProductImage label={product.imageLabel} seed={product.id} src={productImageSrc(product.id, product.categoryId, 220)} icon={category?.icon} size="sm" />
+          <ProductImage label={product.imageLabel} seed={product.id} src={primaryImage(product, 220)} icon={category?.icon} size="sm" />
         </div>
         <div>
           <h3 className="font-bold text-primary">{product.name}</h3>

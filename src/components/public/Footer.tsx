@@ -1,6 +1,9 @@
 import { Link } from "react-router-dom";
 import { MapPin, Phone, ChevronUp, Instagram, Facebook, Youtube } from "lucide-react";
+import { useData } from "@/stores/useData";
+
 export function Footer() {
+  const settings = useData((s) => s.settings);
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -13,7 +16,13 @@ export function Footer() {
           {/* Column 1: Logo & About */}
           <div className="lg:col-span-4 space-y-4">
             <Link to="/" className="flex items-center gap-3">
-              <img src="/logo-full.png" alt="MAFT MARKETING" className="h-14 w-auto object-contain brightness-0 invert" />
+              {settings.logoUrl ? (
+                <span className="flex h-14 items-center justify-center rounded-xl bg-white px-2">
+                  <img src={settings.logoUrl} alt="MAFT MARKETING" className="max-h-11 w-auto object-contain" />
+                </span>
+              ) : (
+                <img src="/logo-full.png" alt="MAFT MARKETING" className="h-14 w-auto object-contain brightness-0 invert" />
+              )}
               <span className="border-l border-white/15 pl-3 text-[10px] font-bold uppercase leading-tight tracking-[0.18em] text-[#baa482]">
                 Your Trusted<br />Partner
               </span>

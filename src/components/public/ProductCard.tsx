@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Heart, ShoppingCart } from "lucide-react";
 import type { Category, Colour, Product, Size } from "@/types";
-import { productImageSrc } from "@/data/images";
+import { primaryImage } from "@/data/images";
 import { productColours, productSizes } from "@/lib/catalogue";
 import { cn } from "@/lib/utils";
 
@@ -19,7 +19,7 @@ export function ProductCard({ product, category, colours, sizes, onQuickAdd }: P
   const pColours = productColours(product, colours);
   const pSizes = productSizes(product, sizes);
 
-  const imgSrc = productImageSrc(product.id, product.categoryId);
+  const imgSrc = primaryImage(product);
 
   return (
     <div className="group relative flex flex-col rounded-2xl border border-[#ece8df] bg-white p-3.5 transition-all duration-300 hover:-translate-y-1 hover:border-[#dfd8cc] hover:shadow-card">

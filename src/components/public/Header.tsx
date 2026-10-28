@@ -7,10 +7,11 @@ import { buildWhatsAppUrl } from "@/lib/whatsapp";
 import { cn } from "@/lib/utils";
 
 function Logo({ compact = false }: { compact?: boolean }) {
+  const logoUrl = useData((s) => s.settings.logoUrl);
   return (
     <Link to="/" className="flex items-center gap-3 shrink-0">
       <img
-        src="/logo-full.png"
+        src={logoUrl || "/logo-full.png"}
         alt="MAFT MARKETING"
         className={cn("w-auto object-contain", compact ? "h-11" : "h-12 sm:h-14")}
       />

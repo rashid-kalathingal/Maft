@@ -31,6 +31,8 @@ export interface Product {
   imageLabel: string;
   hasVariants: boolean;
   variants: ProductVariant[];
+  /** Up to 4 uploaded product photos (data URLs in the demo; backend URLs later). */
+  imageUrls?: string[];
   specifications: ProductSpecification[];
   packingInfo?: string;
   /** Single stock figure used only when hasVariants === false. */
@@ -88,4 +90,6 @@ export interface Settings {
   whatsappNumber: string;
   showStock: boolean;
   productsPerPage: number;
+  /** Optional uploaded brand logo (data URL) that overrides the bundled logo. */
+  logoUrl?: string;
 }

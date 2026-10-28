@@ -1,6 +1,7 @@
 /**
  * Verified image mappings for categories and products to match MAFT Marketing catalogue.
  */
+import type { Product } from "@/types";
 
 export function unsplash(id: string, w: number, h = w, q = 72): string {
   return `https://images.unsplash.com/photo-${id}?w=${w}&h=${h}&q=${q}&auto=format&fit=crop`;
@@ -48,6 +49,18 @@ export function productImageSrc(productId: string, categoryId: string | undefine
   const list = (categoryId && CATEGORY_IMAGES[categoryId]) || FALLBACK;
   const id = list[hash(productId) % list.length];
   return id.startsWith("/") || id.startsWith("http") ? id : unsplash(id, px);
+}
+
+/** Primary image for a product: uploaded photo if present, else category image. */
+export function primaryImage(product: Product, px = 500): string {
+  if (product.imageUrls && product.imageUrls.length > 0) return product.imageUrls[0];
+  return productImageSrc(product.id, product.categoryId, px);
+}
+
+/** Gallery for a product: uploaded photos if present, else category gallery. */
+export function galleryImages(product: Product, px = 700): string[] {
+  if (product.imageUrls && product.imageUrls.length > 0) return product.imageUrls;
+  return productGallery(product.id, product.categoryId, px);
 }
 
 /** Representative image for a category card. */

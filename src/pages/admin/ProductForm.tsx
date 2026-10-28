@@ -1,12 +1,15 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, Plus, Trash2, Save, Wand2, X } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, Save, Wand2, X, Upload, Star } from "lucide-react";
 import { useData } from "@/stores/useData";
 import { toast } from "@/stores/useToast";
 import { Modal } from "@/components/ui/Modal";
 import { Swatch } from "@/components/ui/Swatch";
 import type { Colour, Product, ProductSpecification, ProductVariant } from "@/types";
 import { slugify, uid, cn } from "@/lib/utils";
+import { ACCEPTED_IMAGE_TYPES, MAX_IMAGE_BYTES, fileToResizedDataUrl } from "@/lib/imageUpload";
+
+const MAX_IMAGES = 4;
 
 interface VariantDraft {
   key: string;
@@ -64,8 +67,53 @@ export function ProductForm() {
     })),
   );
 
+  const [imageUrls, setImageUrls] = useState<string[]>(existing?.imageUrls ?? []);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const [colourModal, setColourModal] = useState(false);
   const effectiveSku = sku.trim() || (existing?.sku ?? `MAFT-${Date.now().toString().slice(-6)}`);
+
+  const handleFiles = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    const room = MAX_IMAGES - imageUrls.length;
+    if (room <= 0) {
+      toast.error(`You can upload up to ${MAX_IMAGES} images.`);
+      return;
+    }
+    const chosen = Array.from(files).slice(0, room);
+    setUploading(true);
+    try {
+      const added: string[] = [];
+      for (const file of chosen) {
+        if (!file.type.startsWith("image/")) {
+          toast.error(`${file.name} is not an image.`);
+          continue;
+        }
+        if (file.size > MAX_IMAGE_BYTES) {
+          toast.error(`${file.name} is too large (max 8MB).`);
+          continue;
+        }
+        added.push(await fileToResizedDataUrl(file));
+      }
+      if (added.length) setImageUrls((prev) => [...prev, ...added].slice(0, MAX_IMAGES));
+    } catch {
+      toast.error("Could not process one of the images.");
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  const removeImage = (i: number) => setImageUrls((prev) => prev.filter((_, j) => j !== i));
+  const makePrimary = (i: number) =>
+    setImageUrls((prev) => {
+      if (i === 0) return prev;
+      const next = [...prev];
+      const [picked] = next.splice(i, 1);
+      next.unshift(picked);
+      return next;
+    });
 
   const buildCombos = (): VariantDraft[] => {
     const cList = selColours.length ? selColours : [undefined];
@@ -145,6 +193,7 @@ export function ProductForm() {
       imageLabel: existing?.imageLabel ?? name.trim().split(/\s+/).slice(0, 2).map((w) => w[0]).join("").toUpperCase(),
       hasVariants: variants.length > 1,
       variants,
+      imageUrls: imageUrls.length ? imageUrls : undefined,
       specifications: specs.filter((s) => s.key.trim()),
       packingInfo: packingInfo.trim() || undefined,
       stockQuantity: variants.length === 0 ? Math.max(0, singleStock) : 0,
@@ -195,6 +244,56 @@ export function ProductForm() {
             <input className="input" value={packingInfo} onChange={(e) => setPacking(e.target.value)} placeholder="e.g. 60 PCS BOX" />
           </Field>
         </div>
+      </Section>
+
+      {/* Images */}
+      <Section title={`Product Images (${imageUrls.length}/${MAX_IMAGES})`}>
+        <div className="flex flex-wrap gap-3">
+          {imageUrls.map((url, i) => (
+            <div key={i} className="group relative h-28 w-28 overflow-hidden rounded-xl border border-line bg-surface">
+              <img src={url} alt={`Product ${i + 1}`} className="h-full w-full object-cover" />
+              {i === 0 && (
+                <span className="absolute left-1.5 top-1.5 rounded-full bg-accent px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white">
+                  Primary
+                </span>
+              )}
+              <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-1 bg-black/55 px-1.5 py-1 opacity-0 transition group-hover:opacity-100">
+                {i !== 0 && (
+                  <button type="button" onClick={() => makePrimary(i)} title="Make primary" className="text-white/90 hover:text-accent">
+                    <Star className="h-3.5 w-3.5" />
+                  </button>
+                )}
+                <button type="button" onClick={() => removeImage(i)} title="Remove" className="ml-auto text-white/90 hover:text-danger">
+                  <Trash2 className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            </div>
+          ))}
+
+          {imageUrls.length < MAX_IMAGES && (
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploading}
+              className="flex h-28 w-28 flex-col items-center justify-center gap-1.5 rounded-xl border-2 border-dashed border-line text-muted transition hover:border-accent/50 hover:text-accent disabled:opacity-50"
+            >
+              <Upload className="h-5 w-5" />
+              <span className="text-xs font-semibold">{uploading ? "Uploading…" : "Upload"}</span>
+            </button>
+          )}
+        </div>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept={ACCEPTED_IMAGE_TYPES}
+          multiple
+          className="hidden"
+          onChange={(e) => handleFiles(e.target.files)}
+        />
+        <p className="mt-2 text-xs text-muted">
+          Upload up to {MAX_IMAGES} photos (JPG, PNG or WebP). The first image is the primary — hover an
+          image to make it primary or remove it. If no photos are uploaded, a category image is shown.
+        </p>
       </Section>
 
       {/* Variants */}

@@ -9,7 +9,7 @@ import { VariantControls } from "@/components/public/VariantControls";
 import { ProductCard } from "@/components/public/ProductCard";
 import { QuickAddModal } from "@/components/public/QuickAddModal";
 import { useVariantSelection } from "@/lib/useVariantSelection";
-import { productGallery } from "@/data/images";
+import { galleryImages } from "@/data/images";
 import { quickEnquiryUrl } from "@/lib/whatsapp";
 import type { Product } from "@/types";
 
@@ -40,7 +40,7 @@ function ProductView({ product }: { product: Product }) {
 
   const category = categories.find((c) => c.id === product.categoryId);
   const sel = useVariantSelection(product, colours, sizes);
-  const gallery = productGallery(product.id, product.categoryId);
+  const gallery = galleryImages(product);
   const [activeImg, setActiveImg] = useState(0);
 
   const related = useMemo(

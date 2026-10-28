@@ -1,22 +1,50 @@
-import { useState } from "react";
-import { Save, RotateCcw } from "lucide-react";
+import { useRef, useState } from "react";
+import { Save, Upload, Trash2 } from "lucide-react";
 import { useData } from "@/stores/useData";
 import { toast } from "@/stores/useToast";
-import { Modal } from "@/components/ui/Modal";
 import type { Settings } from "@/types";
 import { cn } from "@/lib/utils";
+import { ACCEPTED_IMAGE_TYPES, MAX_IMAGE_BYTES, fileToResizedDataUrl } from "@/lib/imageUpload";
 
-const TABS = ["General", "WhatsApp", "Catalogue", "Demo Data"] as const;
+const TABS = ["General", "Branding", "WhatsApp", "Catalogue"] as const;
 type Tab = (typeof TABS)[number];
 
 export function AdminSettings() {
-  const { settings, saveSettings, resetDemoData } = useData();
+  const { settings, saveSettings } = useData();
   const [tab, setTab] = useState<Tab>("General");
   const [form, setForm] = useState<Settings>(settings);
-  const [confirmReset, setConfirmReset] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
 
   const set = <K extends keyof Settings>(key: K, value: Settings[K]) => setForm({ ...form, [key]: value });
   const save = () => { saveSettings(form); toast.success("Settings saved."); };
+
+  const onLogoFile = async (file?: File) => {
+    if (!file) return;
+    if (!file.type.startsWith("image/")) return toast.error("Please choose an image file.");
+    if (file.size > MAX_IMAGE_BYTES) return toast.error("Image too large (max 8MB).");
+    setUploading(true);
+    try {
+      // Keep the logo crisp but small; transparent PNGs stay PNG.
+      const dataUrl = await fileToResizedDataUrl(file, 512, 0.9);
+      const next = { ...form, logoUrl: dataUrl };
+      setForm(next);
+      saveSettings(next); // apply immediately so the header/footer update
+      toast.success("Brand logo updated.");
+    } catch {
+      toast.error("Could not process the image.");
+    } finally {
+      setUploading(false);
+      if (fileRef.current) fileRef.current.value = "";
+    }
+  };
+
+  const resetLogo = () => {
+    const next = { ...form, logoUrl: undefined };
+    setForm(next);
+    saveSettings(next);
+    toast.info("Reverted to the default logo.");
+  };
 
   return (
     <div className="max-w-3xl space-y-5">
@@ -43,6 +71,37 @@ export function AdminSettings() {
         </div>
       )}
 
+      {tab === "Branding" && (
+        <div className="card space-y-5 p-6">
+          <div>
+            <h2 className="font-bold text-primary">Brand Logo</h2>
+            <p className="mt-1 text-sm text-ink-soft">
+              Upload your logo (PNG with transparency works best). It replaces the default logo across the
+              header, footer and admin. Applies as soon as you upload.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-5">
+            <div className="flex h-24 w-40 items-center justify-center overflow-hidden rounded-xl border border-line bg-[#faf7f2]">
+              <img src={form.logoUrl || "/logo-full.png"} alt="Current logo" className="max-h-20 max-w-[9rem] object-contain" />
+            </div>
+            <div className="flex flex-col gap-2">
+              <button onClick={() => fileRef.current?.click()} disabled={uploading} className="btn-primary w-fit">
+                <Upload className="h-4 w-4" /> {uploading ? "Uploading…" : "Upload Logo"}
+              </button>
+              {form.logoUrl && (
+                <button onClick={resetLogo} className="btn-outline w-fit text-sm">
+                  <Trash2 className="h-4 w-4" /> Remove (use default)
+                </button>
+              )}
+              <span className="text-xs text-muted">{form.logoUrl ? "Custom logo in use" : "Default logo in use"}</span>
+            </div>
+          </div>
+
+          <input ref={fileRef} type="file" accept={ACCEPTED_IMAGE_TYPES} className="hidden" onChange={(e) => onLogoFile(e.target.files?.[0])} />
+        </div>
+      )}
+
       {tab === "WhatsApp" && (
         <div className="card space-y-4 p-6">
           <Row label="WhatsApp Number" hint="Country code + number, digits only (e.g. 919048687010)">
@@ -57,44 +116,15 @@ export function AdminSettings() {
 
       {tab === "Catalogue" && (
         <div className="card space-y-4 p-6">
-          <label className="flex items-center gap-2.5 text-sm text-ink-soft">
-            <input type="checkbox" checked={form.showStock} onChange={(e) => set("showStock", e.target.checked)} className="h-4 w-4 rounded border-line text-accent" />
-            Show stock availability on the website
-          </label>
           <Row label="Products Per Page">
             <input type="number" min={4} max={48} className="input w-28" value={form.productsPerPage} onChange={(e) => set("productsPerPage", parseInt(e.target.value, 10) || 16)} />
           </Row>
           <p className="rounded-lg bg-surface px-3 py-2.5 text-xs text-muted">
-            Prices are disabled in this demo because the supplied catalogue has no confirmed pricing — enquiries go through WhatsApp.
+            Prices are disabled because the catalogue has no confirmed pricing — enquiries go through WhatsApp.
           </p>
           <SaveBtn onClick={save} />
         </div>
       )}
-
-      {tab === "Demo Data" && (
-        <div className="card space-y-4 p-6">
-          <h2 className="font-bold text-primary">Reset Demo Data</h2>
-          <p className="text-sm text-ink-soft">
-            Restore the original seeded products, categories, colours, sizes and settings. This clears any
-            products you've added or edited in this browser. Your cart is not affected.
-          </p>
-          <button onClick={() => setConfirmReset(true)} className="btn-danger w-fit"><RotateCcw className="h-4 w-4" /> Reset Demo Data</button>
-        </div>
-      )}
-
-      <Modal
-        open={confirmReset}
-        onClose={() => setConfirmReset(false)}
-        title="Reset all demo data?"
-        footer={
-          <div className="flex justify-end gap-3">
-            <button onClick={() => setConfirmReset(false)} className="btn-outline">Cancel</button>
-            <button onClick={() => { resetDemoData(); setForm(useData.getState().settings); setConfirmReset(false); toast.success("Demo data reset."); }} className="btn-danger">Reset Everything</button>
-          </div>
-        }
-      >
-        <p className="text-sm text-ink-soft">This can't be undone. All catalogue changes in this browser will be reverted to the original seed.</p>
-      </Modal>
     </div>
   );
 }
