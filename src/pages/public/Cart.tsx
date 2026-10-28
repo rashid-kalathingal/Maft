@@ -7,7 +7,6 @@ import { toast } from "@/stores/useToast";
 import { Modal } from "@/components/ui/Modal";
 import { ProductImage } from "@/components/ui/ProductImage";
 import { productImageSrc } from "@/data/images";
-import { StockBadge } from "@/components/ui/StockBadge";
 import {
   buildWhatsAppMessage,
   buildWhatsAppUrl,
@@ -27,7 +26,6 @@ export function Cart() {
   );
 
   const totalQty = lines.reduce((s, l) => s + l.quantity, 0);
-  const hasUnavailable = lines.some((l) => !l.inStock);
 
   if (items.length === 0) {
     return (
@@ -61,7 +59,6 @@ export function Cart() {
               sku: variant?.sku ?? product.sku,
               sizeLabel: sizes.find((s) => s.id === variant?.sizeId)?.label,
               colourName: colours.find((c) => c.id === variant?.colourId)?.name,
-              inStock: variant ? variant.isActive && variant.stockQuantity > 0 : product.stockQuantity > 0,
             };
             const cat = categories.find((c) => c.id === product.categoryId);
             return (
@@ -109,7 +106,6 @@ export function Cart() {
                         <Plus className="h-3.5 w-3.5" />
                       </button>
                     </div>
-                    {settings.showStock && <StockBadge inStock={line.inStock} />}
                   </div>
                 </div>
               </div>
@@ -145,12 +141,6 @@ export function Cart() {
               Prices are confirmed over WhatsApp. Sending your cart opens WhatsApp with a prepared
               message — you review and send it yourself. No payment is taken here.
             </div>
-
-            {hasUnavailable && (
-              <p className="mb-3 rounded-lg bg-danger/5 px-3 py-2 text-xs text-danger">
-                Some items are out of stock. You can still send the enquiry, but please confirm availability.
-              </p>
-            )}
 
             <button onClick={() => setCheckoutOpen(true)} className="btn-wa w-full py-3">
               <MessageCircle className="h-4 w-4" /> Send Order via WhatsApp

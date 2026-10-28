@@ -64,13 +64,12 @@ export function useVariantSelection(
     sizeIds.length === 1 ? sizeIds[0] : undefined,
   );
 
-  // A colour/size is enabled if at least one active, in-stock variant exists with it,
-  // honouring the complementary current selection.
+  // A colour/size is enabled if at least one active variant exists with it,
+  // honouring the complementary current selection. (Stock is not tracked.)
   const colourEnabled = (id: string) =>
     product.variants.some(
       (v) =>
         v.isActive &&
-        v.stockQuantity > 0 &&
         v.colourId === id &&
         (!needsSize || !sizeId || v.sizeId === sizeId),
     );
@@ -78,7 +77,6 @@ export function useVariantSelection(
     product.variants.some(
       (v) =>
         v.isActive &&
-        v.stockQuantity > 0 &&
         v.sizeId === id &&
         (!needsColour || !colourId || v.colourId === colourId),
     );
@@ -87,11 +85,8 @@ export function useVariantSelection(
   const ready =
     (!needsColour || !!colourId) && (!needsSize || !!sizeId) && !!selectedVariant;
 
-  const maxQty = selectedVariant
-    ? selectedVariant.stockQuantity
-    : product.variants.length === 0
-      ? product.stockQuantity
-      : 0;
+  // No stock limit — quantity is only bounded by the UI minimum of 1.
+  const maxQty = 9999;
 
   return {
     colourId,

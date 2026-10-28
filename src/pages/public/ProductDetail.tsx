@@ -5,13 +5,11 @@ import { useData } from "@/stores/useData";
 import { useCart } from "@/stores/useCart";
 import { toast } from "@/stores/useToast";
 import { ProductImage } from "@/components/ui/ProductImage";
-import { StockBadge } from "@/components/ui/StockBadge";
 import { VariantControls } from "@/components/public/VariantControls";
 import { ProductCard } from "@/components/public/ProductCard";
 import { QuickAddModal } from "@/components/public/QuickAddModal";
 import { useVariantSelection } from "@/lib/useVariantSelection";
 import { productGallery } from "@/data/images";
-import { productInStock } from "@/lib/catalogue";
 import { quickEnquiryUrl } from "@/lib/whatsapp";
 import type { Product } from "@/types";
 
@@ -53,12 +51,11 @@ function ProductView({ product }: { product: Product }) {
     [products, product],
   );
 
-  const inStock = productInStock(product);
-  const canAdd = sel.ready && quantity > 0 && quantity <= sel.maxQty;
+  const canAdd = sel.ready && quantity > 0;
 
   const handleAdd = () => {
     if (!canAdd) {
-      toast.error(sel.ready ? "Quantity exceeds available stock." : "Please select the required options.");
+      toast.error("Please select the required options.");
       return;
     }
     add(product.id, sel.selectedVariant?.id ?? null, quantity);
@@ -115,27 +112,20 @@ function ProductView({ product }: { product: Product }) {
           <h1 className="mt-1 text-3xl font-extrabold tracking-tight text-primary">{product.name}</h1>
           <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-muted">
             <span>Code: <span className="font-semibold text-ink-soft">{product.sku}</span></span>
-            {settings.showStock && <StockBadge inStock={inStock} />}
           </div>
 
           <p className="mt-4 leading-relaxed text-ink-soft">{product.description}</p>
 
           <div className="my-6 h-px bg-line" />
 
-          {inStock ? (
-            <VariantControls sel={sel} quantity={quantity} setQuantity={setQuantity} showStock={settings.showStock} />
-          ) : (
-            <div className="rounded-lg border border-danger/20 bg-danger/5 px-4 py-3 text-sm text-danger">
-              This product is currently out of stock. Contact us on WhatsApp for availability.
-            </div>
-          )}
+          <VariantControls sel={sel} quantity={quantity} setQuantity={setQuantity} />
 
           {sel.selectedVariant && (
             <p className="mt-3 text-xs text-muted">Variant SKU: {sel.selectedVariant.sku}</p>
           )}
 
           <div className="mt-6 flex flex-wrap gap-3">
-            <button onClick={handleAdd} disabled={!inStock || !canAdd} className="btn-accent flex-1 px-5 py-3 sm:flex-none">
+            <button onClick={handleAdd} disabled={!canAdd} className="btn-accent flex-1 px-5 py-3 sm:flex-none">
               <ShoppingCart className="h-4 w-4" /> Add to Cart
             </button>
             <a

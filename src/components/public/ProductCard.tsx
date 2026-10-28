@@ -3,11 +3,7 @@ import { Link } from "react-router-dom";
 import { Heart, ShoppingCart } from "lucide-react";
 import type { Category, Colour, Product, Size } from "@/types";
 import { productImageSrc } from "@/data/images";
-import {
-  productColours,
-  productInStock,
-  productSizes,
-} from "@/lib/catalogue";
+import { productColours, productSizes } from "@/lib/catalogue";
 import { cn } from "@/lib/utils";
 
 interface Props {
@@ -20,7 +16,6 @@ interface Props {
 
 export function ProductCard({ product, category, colours, sizes, onQuickAdd }: Props) {
   const [isWishlisted, setIsWishlisted] = useState(false);
-  const inStock = productInStock(product);
   const pColours = productColours(product, colours);
   const pSizes = productSizes(product, sizes);
 
@@ -126,19 +121,6 @@ export function ProductCard({ product, category, colours, sizes, onQuickAdd }: P
           )}
         </div>
 
-        {/* Stock Status */}
-        <div className="mt-2 flex items-center gap-1.5 text-xs text-[#524a40]">
-          <span
-            className={cn(
-              "h-2 w-2 rounded-full",
-              inStock ? "bg-[#22c55e]" : "bg-red-500"
-            )}
-          />
-          <span className="text-[11px]">
-            Stock: <strong className="font-semibold text-[#1c1813]">{inStock ? "In Stock" : "Out of Stock"}</strong>
-          </span>
-        </div>
-
         {/* Bottom Two Buttons */}
         <div className="mt-3.5 grid grid-cols-2 gap-2">
           <Link
@@ -149,9 +131,8 @@ export function ProductCard({ product, category, colours, sizes, onQuickAdd }: P
           </Link>
           <button
             type="button"
-            disabled={!inStock}
             onClick={() => onQuickAdd(product)}
-            className="inline-flex min-w-0 items-center justify-center gap-1 whitespace-nowrap rounded-lg bg-[#8e5927] px-1 py-2 text-xs font-semibold leading-none text-white shadow-sm transition hover:bg-[#78491d] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40"
+            className="inline-flex min-w-0 items-center justify-center gap-1 whitespace-nowrap rounded-lg bg-[#8e5927] px-1 py-2 text-xs font-semibold leading-none text-white shadow-sm transition hover:bg-[#78491d] active:scale-[0.98]"
           >
             <ShoppingCart className="h-3.5 w-3.5 hidden sm:inline" />
             <span>Add to Cart</span>

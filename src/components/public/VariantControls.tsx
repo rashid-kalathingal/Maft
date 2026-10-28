@@ -7,12 +7,10 @@ export function VariantControls({
   sel,
   quantity,
   setQuantity,
-  showStock,
 }: {
   sel: VariantSelection;
   quantity: number;
   setQuantity: (n: number) => void;
-  showStock: boolean;
 }) {
   return (
     <div className="space-y-5">
@@ -102,9 +100,6 @@ export function VariantControls({
               <Plus className="h-4 w-4" />
             </button>
           </div>
-          {showStock && sel.ready && (
-            <span className="text-sm text-muted">{sel.maxQty} in stock</span>
-          )}
         </div>
       </div>
     </div>

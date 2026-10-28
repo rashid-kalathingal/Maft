@@ -12,17 +12,17 @@ import { useCart } from "@/stores/useCart";
 import { toast } from "@/stores/useToast";
 
 export function QuickAddModal({ product, onClose }: { product: Product; onClose: () => void }) {
-  const { colours, sizes, categories, settings } = useData();
+  const { colours, sizes, categories } = useData();
   const add = useCart((s) => s.add);
   const category = categories.find((c) => c.id === product.categoryId);
   const sel = useVariantSelection(product, colours, sizes);
   const [quantity, setQuantity] = useState(1);
 
-  const canAdd = sel.ready && quantity > 0 && quantity <= sel.maxQty;
+  const canAdd = sel.ready && quantity > 0;
 
   const handleAdd = () => {
     if (!canAdd) {
-      toast.error(sel.ready ? "Quantity exceeds available stock." : "Please select the required options.");
+      toast.error("Please select the required options.");
       return;
     }
     add(product.id, sel.selectedVariant?.id ?? null, quantity);
@@ -58,7 +58,7 @@ export function QuickAddModal({ product, onClose }: { product: Product; onClose:
       </div>
 
       <div className="mt-5">
-        <VariantControls sel={sel} quantity={quantity} setQuantity={setQuantity} showStock={settings.showStock} />
+        <VariantControls sel={sel} quantity={quantity} setQuantity={setQuantity} />
       </div>
     </Modal>
   );

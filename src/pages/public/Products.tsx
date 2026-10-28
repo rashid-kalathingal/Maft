@@ -16,11 +16,7 @@ import { useData } from "@/stores/useData";
 import { ProductCard } from "@/components/public/ProductCard";
 import { QuickAddModal } from "@/components/public/QuickAddModal";
 import type { Product } from "@/types";
-import {
-  productColourIds,
-  productInStock,
-  productSizeIds,
-} from "@/lib/catalogue";
+import { productColourIds, productSizeIds } from "@/lib/catalogue";
 import { cn } from "@/lib/utils";
 import { SITE_IMAGES } from "@/data/images";
 
@@ -42,13 +38,11 @@ export function Products() {
   const [catOpen, setCatOpen] = useState(true);
   const [colOpen, setColOpen] = useState(true);
   const [sizeOpen, setSizeOpen] = useState(true);
-  const [availOpen, setAvailOpen] = useState(true);
 
   const q = params.get("q") ?? "";
   const activeCategories = (params.get("category") ?? "").split(",").filter(Boolean);
   const activeColours = (params.get("colour") ?? "").split(",").filter(Boolean);
   const activeSizes = (params.get("size") ?? "").split(",").filter(Boolean);
-  const availability = params.get("stock") ?? "all";
   const sort = (params.get("sort") as SortKey) ?? "default";
   const page = Math.max(1, parseInt(params.get("page") ?? "1", 10) || 1);
   const perPage = 16;
@@ -99,8 +93,6 @@ export function Products() {
     if (activeSizes.length) {
       list = list.filter((p) => productSizeIds(p).some((id) => activeSizes.includes(id)));
     }
-    if (availability === "in") list = list.filter(productInStock);
-    if (availability === "out") list = list.filter((p) => !productInStock(p));
 
     switch (sort) {
       case "name-asc":
@@ -119,7 +111,7 @@ export function Products() {
         list = [...list].sort((a, b) => a.sortOrder - b.sortOrder);
     }
     return list;
-  }, [products, q, activeCategoryObjs, activeColours, activeSizes, availability, sort]);
+  }, [products, q, activeCategoryObjs, activeColours, activeSizes, sort]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / perPage));
   const safePage = Math.min(page, totalPages);
@@ -154,15 +146,6 @@ export function Products() {
     return counts;
   }, [products]);
 
-  const inStockCount = useMemo(
-    () => products.filter((p) => p.isActive && productInStock(p)).length,
-    [products]
-  );
-  const outOfStockCount = useMemo(
-    () => products.filter((p) => p.isActive && !productInStock(p)).length,
-    [products]
-  );
-
   const activeCategoriesList = categories.filter((c) => c.isActive);
   const visibleCategories = showAllCategories
     ? activeCategoriesList
@@ -178,7 +161,6 @@ export function Products() {
     activeCategories.length > 0 ||
     activeColours.length > 0 ||
     activeSizes.length > 0 ||
-    availability !== "all" ||
     Boolean(q);
 
   // Filters Sidebar Component
@@ -354,50 +336,6 @@ export function Products() {
         )}
       </div>
 
-      {/* Availability Filter */}
-      <div className="pt-2 border-t border-[#f0ede6]">
-        <button
-          onClick={() => setAvailOpen(!availOpen)}
-          className="flex w-full items-center justify-between py-1 text-xs font-bold text-[#1c1813] tracking-wide"
-        >
-          <span>Availability</span>
-          {availOpen ? <ChevronUp className="h-3.5 w-3.5 text-[#888]" /> : <ChevronDown className="h-3.5 w-3.5 text-[#888]" />}
-        </button>
-
-        {availOpen && (
-          <div className="mt-3 space-y-2.5">
-            <label className="flex cursor-pointer items-center justify-between text-xs text-[#4a4238] hover:text-[#1c1813]">
-              <div className="flex items-center gap-2.5">
-                <input
-                  type="checkbox"
-                  checked={availability === "in"}
-                  onChange={() => update({ stock: availability === "in" ? null : "in" })}
-                  className="h-4 w-4 rounded border-[#cec6b8] text-[#8e5927] focus:ring-[#8e5927]"
-                />
-                <span className={cn(availability === "in" && "font-semibold text-[#1c1813]")}>
-                  In Stock
-                </span>
-              </div>
-              <span className="text-[11px] text-[#8c8479]">({inStockCount})</span>
-            </label>
-
-            <label className="flex cursor-pointer items-center justify-between text-xs text-[#4a4238] hover:text-[#1c1813]">
-              <div className="flex items-center gap-2.5">
-                <input
-                  type="checkbox"
-                  checked={availability === "out"}
-                  onChange={() => update({ stock: availability === "out" ? null : "out" })}
-                  className="h-4 w-4 rounded border-[#cec6b8] text-[#8e5927] focus:ring-[#8e5927]"
-                />
-                <span className={cn(availability === "out" && "font-semibold text-[#1c1813]")}>
-                  Out of Stock
-                </span>
-              </div>
-              <span className="text-[11px] text-[#8c8479]">({outOfStockCount})</span>
-            </label>
-          </div>
-        )}
-      </div>
     </div>
   );
 
