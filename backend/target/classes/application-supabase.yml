@@ -1,0 +1,28 @@
+# Supabase PostgreSQL profile: SPRING_PROFILES_ACTIVE=supabase
+# Provide DB_URL / DB_USERNAME / DB_PASSWORD via environment variables.
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://aws-0-eu-west-1.pooler.supabase.com:5432/postgres}
+    driver-class-name: org.postgresql.Driver
+    username: ${DB_USERNAME:postgres.phrkdfhccivjpogbrdom}
+    password: ${DB_PASSWORD:}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    open-in-view: false
+    properties:
+      hibernate:
+        # Batch-load the EAGER @ElementCollections (variants/specs/images) with
+        # IN-clauses instead of one query per product — avoids N+1 over the
+        # remote Supabase pooler that made GET /api/products time out.
+        default_batch_fetch_size: 100
+  h2:
+    console:
+      enabled: false
+
+# Supabase Storage Configuration
+supabase:
+  url: ${SUPABASE_URL:https://phrkdfhccivjpogbrdom.supabase.co}
+  key: ${SUPABASE_ANON_KEY:}
+  storage-bucket: ${SUPABASE_STORAGE_BUCKET:MAFT}

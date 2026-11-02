@@ -1,0 +1,40 @@
+# Default profile = local dev with an in-memory H2 database (zero setup).
+# Switch to MySQL with:  SPRING_PROFILES_ACTIVE=mysql
+spring:
+  application:
+    name: maft-backend
+  datasource:
+    url: jdbc:h2:mem:maft;DB_CLOSE_DELAY=-1;MODE=MySQL
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      hibernate.format_sql: false
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  servlet:
+    multipart:
+      max-file-size: 8MB
+      max-request-size: 40MB
+
+server:
+  port: 8080
+
+app:
+  # Comma-separated list of allowed browser origins (your frontend URLs).
+  cors-allowed-origins: "http://localhost:5173,http://localhost:4173,https://maft-green.vercel.app"
+  upload-dir: ./uploads
+  jwt:
+    # OVERRIDE in production via APP_JWT_SECRET (min 32 chars).
+    secret: "change-me-in-production-please-use-a-long-random-secret-key"
+    expiration-hours: 24
+  admin:
+    # Seeded on first run; override via APP_ADMIN_EMAIL / APP_ADMIN_PASSWORD.
+    email: admin@maftmarketing.com
+    password: Admin@123
