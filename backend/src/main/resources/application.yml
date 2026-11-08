@@ -28,7 +28,7 @@ server:
 
 app:
   # Comma-separated list of allowed browser origins (your frontend URLs).
-  cors-allowed-origins: "http://localhost:5173,http://localhost:4173,https://maft-green.vercel.app"
+  cors-allowed-origins: "http://localhost:5173,http://localhost:4173,https://*.vercel.app"
   upload-dir: ./uploads
   jwt:
     # OVERRIDE in production via APP_JWT_SECRET (min 32 chars).

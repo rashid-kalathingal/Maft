@@ -54,12 +54,14 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        List<String> origins = Arrays.stream(allowedOrigins.split(",")).map(String::trim).toList();
-        if (origins.contains("*")) {
-            config.addAllowedOriginPattern("*");
-        } else {
-            config.setAllowedOrigins(origins);
-        }
+        List<String> origins = Arrays.stream(allowedOrigins.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .toList();
+        // Use origin PATTERNS (not setAllowedOrigins) so wildcard entries like
+        // "https://*.vercel.app" work — this matches every Vercel preview/prod
+        // deploy. Patterns also match exact origins, so localhost still works.
+        origins.forEach(config::addAllowedOriginPattern);
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setExposedHeaders(List.of("Authorization"));
