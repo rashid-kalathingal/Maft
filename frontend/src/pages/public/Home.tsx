@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { useData } from "@/stores/useData";
 import { ProductCard } from "@/components/public/ProductCard";
+import { Skeleton, ProductGridSkeleton } from "@/components/ui/Skeleton";
 import { QuickAddModal } from "@/components/public/QuickAddModal";
 import type { Product } from "@/types";
 import { buildWhatsAppUrl } from "@/lib/whatsapp";
@@ -26,6 +27,7 @@ import { cn } from "@/lib/utils";
 
 export function Home() {
   const { products, categories, colours, sizes, settings } = useData();
+  const loading = useData((s) => s.loading);
   const [quickAdd, setQuickAdd] = useState<Product | null>(null);
 
   const activeProducts = products.filter((p) => p.isActive);
@@ -36,23 +38,8 @@ export function Home() {
   const featuredList = [rec1, rec2, leg, cup].filter(Boolean);
 
   // Approximate category counts matching the mockup design
-  const countFor = (catId: string, defaultCount: number) => {
-    const realCount = activeProducts.filter((p) => p.categoryId === catId).length;
-    return realCount > 0 ? realCount : defaultCount;
-  };
-
-  const defaultCategoryCounts: Record<string, number> = {
-    "cat-recliner": 62,
-    "cat-legs": 36,
-    "cat-fittings": 28,
-    "cat-chair-bases": 18,
-    "cat-accessories": 22,
-    "cat-springs": 26,
-    "cat-fasteners": 18,
-    "cat-fabrics": 34,
-    "cat-adhesives": 16,
-    "cat-other": 28,
-  };
+  // Real number of active products in a category (no dummy fallback).
+  const realCount = (catId: string) => activeProducts.filter((p) => p.categoryId === catId).length;
 
   const wa = buildWhatsAppUrl(
     settings.whatsappNumber,
@@ -163,6 +150,17 @@ export function Home() {
         </div>
 
         {/* 10 Category Cards Grid (5x2) */}
+        {loading && categories.length === 0 ? (
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-5 sm:gap-4">
+            {Array.from({ length: 10 }).map((_, i) => (
+              <div key={i} className="rounded-2xl border border-[#ece8df] bg-white p-3">
+                <Skeleton className="aspect-square w-full rounded-xl" />
+                <Skeleton className="mx-auto mt-3 h-3 w-4/5" />
+                <Skeleton className="mx-auto mt-2 h-2.5 w-1/2" />
+              </div>
+            ))}
+          </div>
+        ) : (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-5 sm:gap-4">
           {categories.filter((c) => c.isActive).map((c) => (
             <Link
@@ -183,12 +181,13 @@ export function Home() {
                   {c.name}
                 </h3>
                 <p className="mt-1 text-[11px] font-medium text-[#8c8479]">
-                  {countFor(c.id, defaultCategoryCounts[c.id] || 24)} Products
+                  {realCount(c.id)} {realCount(c.id) === 1 ? "Product" : "Products"}
                 </p>
               </div>
             </Link>
           ))}
         </div>
+        )}
       </section>
 
       {/* ===================== FEATURED PRODUCTS ===================== */}
@@ -229,18 +228,22 @@ export function Home() {
         </div>
 
         {/* 4-column Product Grid */}
-        <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
-          {featuredList.slice(0, 4).map((p) => (
-            <ProductCard
-              key={p.id}
-              product={p}
-              category={categories.find((c) => c.id === p.categoryId)}
-              colours={colours}
-              sizes={sizes}
-              onQuickAdd={setQuickAdd}
-            />
-          ))}
-        </div>
+        {loading && products.length === 0 ? (
+          <ProductGridSkeleton count={4} />
+        ) : (
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+            {featuredList.slice(0, 4).map((p) => (
+              <ProductCard
+                key={p.id}
+                product={p}
+                category={categories.find((c) => c.id === p.categoryId)}
+                colours={colours}
+                sizes={sizes}
+                onQuickAdd={setQuickAdd}
+              />
+            ))}
+          </div>
+        )}
       </section>
 
       {/* ===================== DARK PROMO BANNER ===================== */}

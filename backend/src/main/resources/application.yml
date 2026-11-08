@@ -24,7 +24,7 @@ spring:
       max-request-size: 40MB
 
 server:
-  port: 8080
+  port: ${PORT:8080}
 
 app:
   # Comma-separated list of allowed browser origins (your frontend URLs).

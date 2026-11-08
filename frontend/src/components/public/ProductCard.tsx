@@ -127,10 +127,10 @@ export function ProductCard({ product, category, colours, sizes, onQuickAdd }: P
           )}
         </div>
 
-        {/* Colour Row */}
-        <div className="mt-2.5 flex items-center gap-1.5 text-xs text-[#6e655a]">
-          <span className="text-[11px] font-medium">Colour:</span>
-          {pColours.length > 0 ? (
+        {/* Colour Row — only when the product actually has colours */}
+        {pColours.length > 0 && (
+          <div className="mt-2.5 flex items-center gap-1.5 text-xs text-[#6e655a]">
+            <span className="text-[11px] font-medium">Colour:</span>
             <div className="flex items-center gap-1.5">
               {pColours.slice(0, 4).map((c) => (
                 <span
@@ -144,13 +144,8 @@ export function ProductCard({ product, category, colours, sizes, onQuickAdd }: P
                 <span className="text-[10px] text-[#999]">+{pColours.length - 4}</span>
               )}
             </div>
-          ) : (
-            <div className="flex items-center gap-1.5">
-              <span className="h-3 w-3 rounded-full bg-[#1a1a1a] border border-black/15" />
-              <span className="h-3 w-3 rounded-full bg-[#c9a227] border border-black/15" />
-            </div>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* Bottom Two Buttons */}
         <div className="mt-3.5 grid grid-cols-2 gap-2">

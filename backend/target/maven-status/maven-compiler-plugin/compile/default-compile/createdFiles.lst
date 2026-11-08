@@ -24,6 +24,7 @@ com/maft/security/JwtService.class
 com/maft/domain/Product.class
 com/maft/web/InquiryController.class
 com/maft/service/SupabaseStorageService.class
+com/maft/web/HealthController.class
 com/maft/web/AuthController.class
 com/maft/domain/Spec.class
 com/maft/domain/Category.class
