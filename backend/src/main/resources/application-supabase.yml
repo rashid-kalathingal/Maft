@@ -6,6 +6,16 @@ spring:
     driver-class-name: org.postgresql.Driver
     username: ${DB_USERNAME:postgres.phrkdfhccivjpogbrdom}
     password: ${DB_PASSWORD:}
+    hikari:
+      # Supabase free-tier session-mode pooler caps TOTAL clients at 15.
+      # Render keeps the OLD instance running while the NEW one boots during a
+      # deploy, so two instances must fit under 15. Keep each instance small.
+      maximum-pool-size: ${DB_POOL_SIZE:4}
+      minimum-idle: 1
+      connection-timeout: 30000
+      # Recycle connections well before Supabase drops idle ones.
+      max-lifetime: 1800000
+      idle-timeout: 300000
   jpa:
     hibernate:
       ddl-auto: update
