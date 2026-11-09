@@ -18,10 +18,16 @@ public class ProductController {
         this.repo = repo;
     }
 
-    /** All products (admin view). The frontend filters/sorts client-side. */
+    /** Full products (heavy: loads variants/specs/images). Kept for compatibility. */
     @GetMapping
     public List<Product> all() {
         return repo.findAll();
+    }
+
+    /** Lightweight card list for catalogue + admin grids — fast scalar projection. */
+    @GetMapping("/list")
+    public List<ProductCard> list() {
+        return repo.findAllCards();
     }
 
     /** Lookup by id or slug (public product page uses the slug). */
@@ -38,6 +44,7 @@ public class ProductController {
         String now = Instant.now().toString();
         if (p.createdAt == null) p.createdAt = now;
         p.updatedAt = now;
+        syncThumbnail(p);
         return repo.save(p);
     }
 
@@ -46,7 +53,13 @@ public class ProductController {
         if (!repo.existsById(id)) return ResponseEntity.notFound().build();
         p.id = id;
         p.updatedAt = Instant.now().toString();
+        syncThumbnail(p);
         return ResponseEntity.ok(repo.save(p));
+    }
+
+    /** Keep the denormalised thumbnail (first image) in step with imageUrls. */
+    private void syncThumbnail(Product p) {
+        p.thumbnailUrl = (p.imageUrls != null && !p.imageUrls.isEmpty()) ? p.imageUrls.get(0) : null;
     }
 
     @DeleteMapping("/{id}")

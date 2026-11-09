@@ -30,6 +30,11 @@ public class Product {
     public String description;
     public String imageLabel;
 
+    /** Denormalised first image (imageUrls[0]) for fast list/card queries that
+     *  must not load the full image collection. Set on create/update. */
+    @Column(columnDefinition = "TEXT")
+    public String thumbnailUrl;
+
     public boolean hasVariants;
 
     /** Optional price (INR). Null/empty means "enquire for price". */
