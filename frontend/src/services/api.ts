@@ -8,6 +8,36 @@ import type { Category, Colour, Product, Settings, Size, Inquiry } from "@/types
 const BASE = (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/$/, "") || "";
 export const apiEnabled = BASE.length > 0;
 
+/** Slim product projection returned by GET /api/products/list. */
+export interface ProductCardDto {
+  id: string; name: string; slug: string; sku: string; categoryId: string;
+  shortDescription: string; price: number | null; imageLabel: string;
+  thumbnailUrl: string | null; hasVariants: boolean; stockQuantity: number;
+  isActive: boolean; isFeatured: boolean; isNewArrival: boolean; sortOrder: number;
+  availability: string; qualityGrade: string | null; replacementGuarantee: boolean;
+  createdAt: string; updatedAt: string;
+}
+
+/**
+ * Expand a slim card into a full Product shape for the store. Nested data the
+ * card omits (variants, specifications, full image list) is left empty; the
+ * detail page and admin edit form re-fetch the full product by id when needed.
+ */
+export function cardToProduct(c: ProductCardDto): Product {
+  return {
+    id: c.id, name: c.name, slug: c.slug, sku: c.sku, categoryId: c.categoryId,
+    shortDescription: c.shortDescription ?? "", description: "",
+    imageLabel: c.imageLabel ?? "", imageUrls: c.thumbnailUrl ? [c.thumbnailUrl] : [],
+    hasVariants: c.hasVariants, variants: [], specifications: [],
+    price: c.price ?? undefined, packingInfo: "", stockQuantity: c.stockQuantity ?? 0,
+    isActive: c.isActive, isFeatured: c.isFeatured, isNewArrival: c.isNewArrival,
+    sortOrder: c.sortOrder ?? 0, availability: c.availability as Product["availability"],
+    qualityGrade: (c.qualityGrade ?? undefined) as Product["qualityGrade"],
+    replacementGuarantee: c.replacementGuarantee,
+    createdAt: c.createdAt ?? "", updatedAt: c.updatedAt ?? "",
+  } as Product;
+}
+
 const TOKEN_KEY = "maft.token";
 
 export function getToken(): string | null {
@@ -56,6 +86,10 @@ export const api = {
 
   // reads
   getProducts: () => req<Product[]>("/api/products"),
+  /** Lightweight card projection for lists/grids (fast; no variants/specs). */
+  getProductList: () => req<ProductCardDto[]>("/api/products/list"),
+  /** Full product by id or slug (used by detail page + admin edit). */
+  getProduct: (idOrSlug: string) => req<Product>(`/api/products/${idOrSlug}`),
   getCategories: () => req<Category[]>("/api/categories"),
   getColours: () => req<Colour[]>("/api/colours"),
   getSizes: () => req<Size[]>("/api/sizes"),

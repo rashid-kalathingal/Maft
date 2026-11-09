@@ -1,5 +1,6 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { api, apiEnabled } from "@/services/api";
 import { ShoppingCart, MessageCircle, ChevronRight, Package } from "lucide-react";
 import { useData } from "@/stores/useData";
 import { useCart } from "@/stores/useCart";
@@ -15,9 +16,31 @@ import type { Product } from "@/types";
 
 export function ProductDetail() {
   const { slug } = useParams();
-  const product = useData((s) => s.products.find((p) => p.slug === slug && p.isActive));
+  // The store holds only slim cards (no specs/variants/full gallery); use it for
+  // an instant first paint, then fetch the full product by slug to enrich it.
+  const storeProduct = useData((s) => s.products.find((p) => p.slug === slug && p.isActive));
+  const [full, setFull] = useState<Product | null>(null);
+  const [notFound, setNotFound] = useState(false);
+
+  useEffect(() => {
+    let alive = true;
+    setFull(null);
+    setNotFound(false);
+    if (!slug || !apiEnabled) return;
+    api
+      .getProduct(slug)
+      .then((p) => alive && setFull(p && p.isActive ? p : null))
+      .catch(() => alive && setNotFound(true));
+    return () => { alive = false; };
+  }, [slug]);
+
+  const product = full ?? storeProduct;
 
   if (!product) {
+    // Still fetching (API on, nothing cached yet) — avoid a false "not found" flash.
+    if (apiEnabled && !notFound) {
+      return <div className="container-app py-24 text-center text-ink-soft">Loading…</div>;
+    }
     return (
       <div className="container-app py-24 text-center">
         <Package className="mx-auto h-12 w-12 text-muted/50" />

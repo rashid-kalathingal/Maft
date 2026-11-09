@@ -26,12 +26,38 @@ function codeFromName(name: string): string {
   return name.replace(/[^a-z0-9]/gi, "").toUpperCase().slice(0, 3) || "VAR";
 }
 
+/**
+ * Loader wrapper: the store holds only slim product cards, so when editing we
+ * fetch the FULL product (specs, variants, all images) before mounting the form
+ * — otherwise saving would wipe the nested data the slim card omits.
+ */
 export function ProductForm() {
   const { id } = useParams();
+  const storeProduct = useData((s) => (id ? s.products.find((p) => p.id === id) : undefined));
+  const [existing, setExisting] = useState<Product | undefined>(storeProduct);
+  const [ready, setReady] = useState(!id || !apiEnabled);
+
+  useEffect(() => {
+    let alive = true;
+    if (id && apiEnabled) {
+      setReady(false);
+      api.getProduct(id)
+        .then((p) => { if (alive) { setExisting(p); setReady(true); } })
+        .catch(() => { if (alive) setReady(true); }); // fall back to slim store copy
+    }
+    return () => { alive = false; };
+  }, [id]);
+
+  if (!ready) {
+    return <div className="container-app py-24 text-center text-ink-soft">Loading…</div>;
+  }
+  return <ProductFormInner key={id ?? "new"} existing={existing ?? storeProduct} />;
+}
+
+function ProductFormInner({ existing }: { existing?: Product }) {
   const navigate = useNavigate();
   const { products, categories, colours, sizes, saveProduct, saveColour } = useData();
 
-  const existing = id ? products.find((p) => p.id === id) : undefined;
   const isEdit = !!existing;
 
   const [name, setName] = useState(existing?.name ?? "");
