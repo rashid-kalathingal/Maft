@@ -4,6 +4,8 @@ WORKDIR /app
 # Retry transient Maven Central failures (e.g. 429 Too Many Requests) instead of
 # failing the whole build; wait between retries.
 ENV MAVEN_OPTS="-Dmaven.wagon.http.retryHandler.count=6 -Dmaven.wagon.httpconnectionManager.ttlSeconds=120 -Dmaven.wagon.rto=60000"
+# Resolve deps via an un-throttled mirror to avoid Maven Central 429s on Render.
+COPY settings.xml /root/.m2/settings.xml
 COPY pom.xml .
 RUN mvn -q -B dependency:go-offline
 COPY src ./src
