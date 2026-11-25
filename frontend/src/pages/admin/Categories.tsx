@@ -99,7 +99,7 @@ function CategoryModal({ category, existing, onClose, onSave }: { category: Cate
   const [name, setName] = useState(category?.name ?? "");
   const [slug, setSlug] = useState(category?.slug ?? "");
   const [description, setDescription] = useState(category?.description ?? "");
-  const [icon, setIcon] = useState(category?.icon ?? "📦");
+  const [icon, setIcon] = useState(category?.icon ?? "");
   const [imageUrl, setImageUrl] = useState(category?.imageUrl ?? "");
   const [uploading, setUploading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -135,7 +135,7 @@ function CategoryModal({ category, existing, onClose, onSave }: { category: Cate
       name: name.trim(),
       slug: finalSlug,
       description: description.trim() || undefined,
-      icon: icon.trim() || "📦",
+      icon: icon.trim(),
       imageUrl: imageUrl || undefined,
       sortOrder,
       isActive: active,
