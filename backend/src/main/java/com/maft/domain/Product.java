@@ -45,11 +45,13 @@ public class Product {
     @OrderColumn(name = "pos")
     public List<Variant> variants = new ArrayList<>();
 
+    // Stored as plain TEXT (NOT @Lob). Postgres @Lob maps to large objects (oid),
+    // whose per-value reads hang over the Supabase pooler — a product with many
+    // images became unfetchable. New table so Hibernate creates a clean text column.
     @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "product_images", joinColumns = @JoinColumn(name = "product_id"))
+    @CollectionTable(name = "product_images_v2", joinColumns = @JoinColumn(name = "product_id"))
     @OrderColumn(name = "pos")
-    @Lob
-    @Column(name = "url")
+    @Column(name = "url", columnDefinition = "TEXT")
     public List<String> imageUrls = new ArrayList<>();
 
     @ElementCollection(fetch = FetchType.EAGER)
