@@ -66,7 +66,7 @@ export function Cart() {
             const cat = categories.find((c) => c.id === product.categoryId);
             return (
               <div key={cartItem.id} className="card flex gap-4 p-3.5">
-                <Link to={`/products/${line.product.slug}`} className="h-24 w-24 shrink-0 overflow-hidden rounded-lg border border-line">
+                <Link to={`/products/${line.product.slug}`} className="h-24 w-24 shrink-0 overflow-hidden rounded-lg border border-line bg-white [&_img]:object-contain">
                   <ProductImage label={line.product.imageLabel} seed={line.product.id} src={primaryImage(line.product, 220)} icon={cat?.icon} size="sm" />
                 </Link>
                 <div className="flex min-w-0 flex-1 flex-col">

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { api, apiEnabled } from "@/services/api";
-import { ShoppingCart, MessageCircle, ChevronRight, Package } from "lucide-react";
+import { ShoppingCart, ChevronRight, Package } from "lucide-react";
 import { useData } from "@/stores/useData";
 import { useCart } from "@/stores/useCart";
 import { toast } from "@/stores/useToast";
@@ -104,8 +104,8 @@ function ProductView({ product }: { product: Product }) {
       <div className="mt-5 grid gap-6 lg:mt-6 lg:gap-8 lg:grid-cols-2">
         {/* Gallery */}
         <div className="lg:sticky lg:top-24 lg:self-start">
-          <div className="group card overflow-hidden">
-            <ProductImage label={product.imageLabel} seed={product.id} src={gallery[activeImg]} icon={category?.icon} size="lg" aspectRatio="landscape" />
+          <div className="group card overflow-hidden bg-white [&_img]:object-contain">
+            <ProductImage label={product.imageLabel} seed={product.id} src={gallery[activeImg]} icon={category?.icon} size="lg" aspectRatio="square" />
           </div>
           {gallery.length > 1 && (
             <div className="mt-3 flex gap-2.5 overflow-x-auto pb-1 [-webkit-overflow-scrolling:touch]">
@@ -113,11 +113,11 @@ function ProductView({ product }: { product: Product }) {
                 <button
                   key={i}
                   onClick={() => setActiveImg(i)}
-                  className={`h-16 w-20 shrink-0 overflow-hidden rounded-xl border-2 transition sm:h-20 sm:w-28 ${
+                  className={`h-16 w-16 shrink-0 overflow-hidden rounded-xl border-2 bg-white transition sm:h-20 sm:w-20 [&_img]:object-contain ${
                     i === activeImg ? "border-accent" : "border-line opacity-70 hover:opacity-100"
                   }`}
                 >
-                  <ProductImage label={product.imageLabel} seed={product.id + i} src={src} size="sm" aspectRatio="landscape" />
+                  <ProductImage label={product.imageLabel} seed={product.id + i} src={src} size="sm" aspectRatio="square" />
                 </button>
               ))}
             </div>
@@ -151,7 +151,7 @@ function ProductView({ product }: { product: Product }) {
 
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
             <button onClick={handleAdd} disabled={!canAdd} className="btn-accent w-full justify-center px-5 py-3 sm:w-auto">
-              <ShoppingCart className="h-4 w-4" /> Add to Cart
+              <ShoppingCart className="h-4 w-4" /> Add
             </button>
             <a
               href={quickEnquiryUrl(product, settings)}
@@ -159,7 +159,7 @@ function ProductView({ product }: { product: Product }) {
               rel="noreferrer"
               className="btn-wa w-full justify-center px-5 py-3 sm:w-auto"
             >
-              <MessageCircle className="h-4 w-4" /> WhatsApp Enquiry
+              <img src="/whatsapp.png" alt="" className="h-5 w-5 object-contain" /> WhatsApp Enquiry
             </a>
           </div>
 

@@ -161,7 +161,7 @@ export function ProductCard({ product, category, colours, sizes, onQuickAdd }: P
             className="inline-flex min-w-0 items-center justify-center gap-1 whitespace-nowrap rounded-lg bg-[#8e5927] px-1 py-2 text-xs font-semibold leading-none text-white shadow-sm transition hover:bg-[#78491d] active:scale-[0.98]"
           >
             <ShoppingCart className="h-3.5 w-3.5 hidden sm:inline" />
-            <span>Add to Cart</span>
+            <span>Add</span>
           </button>
         </div>
       </div>

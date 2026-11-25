@@ -41,13 +41,13 @@ export function QuickAddModal({ product, onClose }: { product: Product; onClose:
             View full details
           </Link>
           <button onClick={handleAdd} disabled={!canAdd} className="btn-accent ml-auto">
-            <ShoppingCart className="h-4 w-4" /> Add to Cart
+            <ShoppingCart className="h-4 w-4" /> Add
           </button>
         </div>
       }
     >
       <div className="flex gap-4">
-        <div className="h-24 w-24 shrink-0 overflow-hidden rounded-lg border border-line">
+        <div className="h-24 w-24 shrink-0 overflow-hidden rounded-lg border border-line bg-white [&_img]:object-contain">
           <ProductImage label={product.imageLabel} seed={product.id} src={primaryImage(product, 220)} icon={category?.icon} size="sm" />
         </div>
         <div>
