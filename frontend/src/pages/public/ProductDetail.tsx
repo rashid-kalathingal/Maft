@@ -86,7 +86,7 @@ function ProductView({ product }: { product: Product }) {
   };
 
   return (
-    <div className="container-app py-8">
+    <div className="container-app py-8 overflow-x-hidden pb-24 lg:pb-8">
       <nav className="flex flex-wrap items-center gap-1 text-sm text-muted">
         <Link to="/" className="hover:text-accent">Home</Link>
         <ChevronRight className="h-3.5 w-3.5" />
@@ -103,7 +103,7 @@ function ProductView({ product }: { product: Product }) {
 
       <div className="mt-5 grid gap-6 lg:mt-6 lg:gap-8 lg:grid-cols-2">
         {/* Gallery */}
-        <div className="lg:sticky lg:top-24 lg:self-start">
+        <div className="min-w-0 lg:sticky lg:top-24 lg:self-start">
           <div className="group card overflow-hidden bg-white [&_img]:object-contain">
             <ProductImage label={product.imageLabel} seed={product.id} src={gallery[activeImg]} icon={category?.icon} size="lg" aspectRatio="square" />
           </div>
@@ -128,7 +128,7 @@ function ProductView({ product }: { product: Product }) {
         </div>
 
         {/* Info */}
-        <div>
+        <div className="min-w-0">
           {category && (
             <Link to={`/products?category=${category.slug}`} className="text-sm font-semibold text-accent">
               {category.name}
@@ -136,10 +136,10 @@ function ProductView({ product }: { product: Product }) {
           )}
           <h1 className="mt-1 text-2xl font-extrabold tracking-tight text-primary sm:text-3xl">{product.name}</h1>
           <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-muted">
-            <span>Code: <span className="font-semibold text-ink-soft">{product.sku}</span></span>
+            <span className="break-all">Code: <span className="font-semibold text-ink-soft">{product.sku}</span></span>
           </div>
 
-          <p className="mt-4 leading-relaxed text-ink-soft">{product.description}</p>
+          <p className="mt-4 break-words leading-relaxed text-ink-soft">{product.description}</p>
 
           <div className="my-6 h-px bg-line" />
 
@@ -176,7 +176,7 @@ function ProductView({ product }: { product: Product }) {
                         <td className="px-4 py-2.5 text-ink">{s.value}</td>
                       </tr>
                     ))}
-                    {product.packingInfo && (
+                    {product.packingInfo && !product.specifications.some((s) => s.key.trim().toLowerCase() === "packing") && (
                       <tr className={product.specifications.length % 2 ? "bg-surface" : ""}>
                         <td className="px-4 py-2.5 font-medium text-ink-soft">Packing</td>
                         <td className="px-4 py-2.5 text-ink">{product.packingInfo}</td>
