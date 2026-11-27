@@ -20,7 +20,7 @@ import {
   saveJSON,
   STORAGE_KEYS,
 } from "@/lib/storage";
-import { api, apiEnabled, cardToProduct, getToken } from "@/services/api";
+import { api, apiEnabled, getToken } from "@/services/api";
 import { toast } from "@/stores/useToast";
 
 /** Fire an API write in the background; surface failures without blocking the UI. */
@@ -286,14 +286,16 @@ export const useData = create<DataState>((set, get) => ({
     set({ loading: true });
     try {
       // Public catalogue data — available without authentication.
-      const [cards, categories, colours, sizes, settings] = await Promise.all([
-        api.getProductList(),
+      // Full products (incl. variants) — fast now that images are stored as TEXT,
+      // so the cart and WhatsApp enquiry can show each item's colour/size.
+      const [products, categories, colours, sizes, settings] = await Promise.all([
+        api.getProducts(),
         api.getCategories(),
         api.getColours(),
         api.getSizes(),
         api.getSettings(),
       ]);
-      set({ products: cards.map(cardToProduct), categories, colours, sizes, settings });
+      set({ products, categories, colours, sizes, settings });
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Could not load data from server.");
     } finally {
