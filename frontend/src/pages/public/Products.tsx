@@ -343,60 +343,47 @@ export function Products() {
 
   return (
     <div className="min-h-screen bg-[#fcfaf7]">
-      {/* ===================== BANNER / HERO ===================== */}
-      <section className="relative overflow-hidden border-b border-[#ece7de] bg-gradient-to-br from-[#faf7f2] via-[#f7f1e8] to-[#f1e8da]">
-        {/* soft decorative accent */}
-        <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-[#8e5927]/5 blur-3xl" aria-hidden />
-        <div className="relative container-app py-9 sm:py-12">
-          <div className="grid items-center gap-7 lg:grid-cols-12">
-            {/* Left Banner Text */}
-            <div className="lg:col-span-7">
-              <span className="inline-flex items-center gap-2 text-[0.7rem] font-bold uppercase tracking-[0.18em] text-[#8e5927]">
-                <span className="h-px w-6 bg-[#8e5927]/50" /> Furniture Hardware Catalogue
-              </span>
-              <h1 className="mt-3 text-3xl sm:text-4xl lg:text-[2.7rem] font-extrabold leading-[1.05] tracking-tight text-[#1c1813]">
-                Our <span className="text-[#935a2b]">Products</span>
-              </h1>
-              <p className="mt-3 max-w-xl text-sm text-[#5e554a] leading-relaxed">
-                Explore a wide range of furniture hardware, recliner mechanisms, sofa legs, fittings,
-                upholstery accessories, and essential materials for furniture manufacturing.
-              </p>
+      {/* ===================== BANNER / HERO (full-width image) ===================== */}
+      <section className="relative overflow-hidden border-b border-[#ece7de]">
+        {/* Full-bleed background image */}
+        <img
+          src={SITE_IMAGES.hero}
+          alt="Premium furniture solutions"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+        {/* Legibility overlay: dark on the left where the text sits */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/55 to-black/20" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
 
-              {/* Trust badges as chips */}
-              <div className="mt-6 flex flex-wrap items-center gap-2.5">
-                {[
-                  { Icon: Layers, label: "Wide Range" },
-                  { Icon: ShieldCheck, label: "Quality Focused" },
-                  { Icon: Headphones, label: "Dedicated Support" },
-                ].map(({ Icon, label }) => (
-                  <span
-                    key={label}
-                    className="inline-flex items-center gap-1.5 rounded-full border border-[#e7ddcc] bg-white/80 px-3 py-1.5 text-xs font-semibold text-[#4a4238] shadow-sm backdrop-blur"
-                  >
-                    <Icon className="h-3.5 w-3.5 text-[#8e5927]" />
-                    {label}
-                  </span>
-                ))}
-              </div>
-            </div>
+        {/* Content on top */}
+        <div className="relative container-app py-14 sm:py-20 lg:py-24">
+          <div className="max-w-2xl">
+            <span className="inline-flex items-center gap-2 text-[0.7rem] font-bold uppercase tracking-[0.2em] text-[#e4b183]">
+              <span className="h-px w-6 bg-[#e4b183]/70" /> Furniture Hardware Catalogue
+            </span>
+            <h1 className="mt-3 text-4xl font-extrabold leading-[1.05] tracking-tight text-white drop-shadow sm:text-5xl lg:text-[3.4rem]">
+              Our <span className="text-[#e9b98a]">Products</span>
+            </h1>
+            <p className="mt-4 max-w-xl text-sm leading-relaxed text-white/85 sm:text-base">
+              Explore a wide range of furniture hardware, recliner mechanisms, sofa legs, fittings,
+              upholstery accessories, and essential materials for furniture manufacturing.
+            </p>
 
-            {/* Right Banner Visual Showcase */}
-            <div className="lg:col-span-5">
-              <div className="group relative h-48 w-full overflow-hidden rounded-2xl border border-[#e8e2d5] shadow-card sm:h-52">
-                <img
-                  src={SITE_IMAGES.hero}
-                  alt="Premium furniture solutions"
-                  className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                />
-                {/* legible gradient + tagline inside the image */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent" />
-                <div className="absolute bottom-3 left-4 right-4">
-                  <p className="text-[0.65rem] font-bold uppercase tracking-[0.2em] text-white/70">MAFT Marketing</p>
-                  <p className="font-script text-2xl leading-tight text-white drop-shadow sm:text-[1.7rem]">
-                    Premium Furniture Solutions
-                  </p>
-                </div>
-              </div>
+            {/* Trust badges as glassy chips */}
+            <div className="mt-6 flex flex-wrap items-center gap-2.5">
+              {[
+                { Icon: Layers, label: "Wide Range" },
+                { Icon: ShieldCheck, label: "Quality Focused" },
+                { Icon: Headphones, label: "Dedicated Support" },
+              ].map(({ Icon, label }) => (
+                <span
+                  key={label}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-white/25 bg-white/10 px-3 py-1.5 text-xs font-semibold text-white shadow-sm backdrop-blur"
+                >
+                  <Icon className="h-3.5 w-3.5 text-[#e9b98a]" />
+                  {label}
+                </span>
+              ))}
             </div>
           </div>
         </div>
