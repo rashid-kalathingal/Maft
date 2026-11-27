@@ -94,7 +94,17 @@ export function buildWhatsAppUrl(number: string, message: string): string {
   return `https://wa.me/${digits}?text=${encodeURIComponent(message)}`;
 }
 
-export function quickEnquiryUrl(product: Product, settings: Settings): string {
-  const msg = `Hello ${settings.businessName}, I'm interested in *${product.name}* (Code: ${product.sku}). Please share availability and price.`;
+export function quickEnquiryUrl(
+  product: Product,
+  settings: Settings,
+  variant?: { sku?: string; colourName?: string; sizeLabel?: string },
+): string {
+  const code = variant?.sku ?? product.sku;
+  const opts = [
+    variant?.sizeLabel && `Size: ${variant.sizeLabel}`,
+    variant?.colourName && `Colour: ${variant.colourName}`,
+  ].filter(Boolean);
+  const optText = opts.length ? ` [${opts.join(", ")}]` : "";
+  const msg = `Hello ${settings.businessName}, I'm interested in *${product.name}* (Code: ${code})${optText}. Please share availability and price.`;
   return buildWhatsAppUrl(settings.whatsappNumber, msg);
 }

@@ -136,7 +136,8 @@ function ProductView({ product }: { product: Product }) {
           )}
           <h1 className="mt-1 text-2xl font-extrabold tracking-tight text-primary sm:text-3xl">{product.name}</h1>
           <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-muted">
-            <span className="break-all">Code: <span className="font-semibold text-ink-soft">{product.sku}</span></span>
+            {/* Show the selected variant's code so it matches the cart & enquiry. */}
+            <span className="break-all">Code: <span className="font-semibold text-ink-soft">{sel.selectedVariant?.sku ?? product.sku}</span></span>
           </div>
 
           <p className="mt-4 break-words leading-relaxed text-ink-soft">{product.description}</p>
@@ -145,16 +146,22 @@ function ProductView({ product }: { product: Product }) {
 
           <VariantControls sel={sel} quantity={quantity} setQuantity={setQuantity} />
 
-          {sel.selectedVariant && (
-            <p className="mt-3 text-xs text-muted">Variant SKU: {sel.selectedVariant.sku}</p>
-          )}
-
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
             <button onClick={handleAdd} disabled={!canAdd} className="btn-accent w-full justify-center px-5 py-3 sm:w-auto">
               <ShoppingCart className="h-4 w-4" /> Add
             </button>
             <a
-              href={quickEnquiryUrl(product, settings)}
+              href={quickEnquiryUrl(
+                product,
+                settings,
+                sel.selectedVariant
+                  ? {
+                      sku: sel.selectedVariant.sku,
+                      colourName: colours.find((c) => c.id === sel.selectedVariant!.colourId)?.name,
+                      sizeLabel: sizes.find((s) => s.id === sel.selectedVariant!.sizeId)?.label,
+                    }
+                  : undefined,
+              )}
               target="_blank"
               rel="noreferrer"
               className="btn-wa w-full justify-center px-5 py-3 sm:w-auto"
